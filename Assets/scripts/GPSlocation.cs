@@ -7,7 +7,7 @@ public class GPSlocation
 	public double latitude;
 	public double longitude;
 
-	public GPSlocation(double x, double y)
+    public GPSlocation(double x, double y)
 	{
 		latitude = x;
 		longitude = y;
@@ -19,7 +19,9 @@ public class GPSlocation
 		longitude = (double)y;
 	}
 
-	public static double Distance(GPSlocation a, GPSlocation b) 
+    public GPSlocation(LocationInfo loc) : this(loc.latitude, loc.longitude) {}
+
+    public static double Distance(GPSlocation a, GPSlocation b) 
 	{
 		double theta = a.longitude - b.longitude;
 
@@ -43,7 +45,7 @@ public class GPSlocation
 
 		double angle = System.Math.Atan2( dLatitude, System.Math.Cos(Mathf.PI/180*a.latitude) * dLongitude);
 
-		angle = angle * 180 / Mathf.PI;
+		//angle = angle * Mathf.Rad2Deg;
 
 		return (angle -90); // convention: 0 degrees when it's vertical, positive counterclockwise
 	}
