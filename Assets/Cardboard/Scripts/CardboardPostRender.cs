@@ -62,7 +62,7 @@ public class CardboardPostRender : MonoBehaviour {
     cam.orthographicSize = 0.5f;
     cam.cullingMask = 0;
     cam.useOcclusionCulling = false;
-    cam.depth = 100;
+    cam.depth = 80;
   }
 
   void Awake() {

@@ -13,10 +13,4 @@ public class Destination : MonoBehaviour {
 	void Update () {
 	
 	}
-
-    public void SetLocation(LocationInfo location, LocationInfo origin)
-    {
-        this.location = location;
-        transform.position = new Vector3(location.latitude, 0, location.longitude) - new Vector3(origin.latitude, 0, origin.longitude);
-    }
 }

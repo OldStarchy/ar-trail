@@ -12,6 +12,6 @@ public class FaceDirectionReader : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         var t = (transform.rotation * Vector3.forward);
-        DirectionReadout.text = ""+ Mathf.Atan2(t.z, t.x);
+        DirectionReadout.text = "" + Input.compass.trueHeading;// Mathf.Atan2(t.z, t.x);
     }
 }
