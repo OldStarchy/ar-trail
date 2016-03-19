@@ -205,6 +205,7 @@ public class DestinationManager : MonoBehaviour
 
     public void ResetLocation()
     {
+        Cardboard.SDK.Recenter();
         transform.position = new Vector3(0, 0, 0);
         if (Input.location.status != LocationServiceStatus.Running && !EnableVirtualGPS)
             return;
