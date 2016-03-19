@@ -34,7 +34,13 @@ public class DestinationManager : MonoBehaviour
 
     public int DestinationCount { get { return destinations.Count; } }
 
-    public bool FollowingRoute;
+    /// <summary>
+    /// Literally not used for anything.
+    /// </summary>
+    public bool FollowingRoute
+    {
+        get; private set;
+    }
     /// <summary>
     /// Is this comment even neccassary?
     /// </summary>
@@ -52,7 +58,7 @@ public class DestinationManager : MonoBehaviour
     /// </summary>
     private float _waypointSize = 7;
     /// <summary>
-    /// Can you spell _ _ _ _ _ _? No? it means radius.
+    /// Can you spell _ _ _ _ _ _? No? it means radius. Its not there because this is a diameter.
     /// </summary>
     public float WaypointSize
     {
@@ -120,7 +126,7 @@ public class DestinationManager : MonoBehaviour
             AccuracyReadout.text = "< " + gl.horizontalAccuracy + "m";
 
             AccuracyCircle.localScale = new Vector3((float)gl.horizontalAccuracy, 1, (float)gl.horizontalAccuracy);
-
+            WaypointSize = (float)gl.horizontalAccuracy;
             if (initialLocation == null) {
                 ResetLocation();
             } else {
@@ -232,5 +238,40 @@ public class DestinationManager : MonoBehaviour
         Destination destination = GameObject.Instantiate(PointerObject);
         destination.transform.position = transform.position;
         destinations.Add(destination);
+    }
+
+    public void SaveData()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.SetInt("destination count", destinations.Count);
+        for (int i = 0; i < destinations.Count; i++) {
+            var d = destinations[i];
+
+            PlayerPrefs.SetFloat(i + "_x", d.transform.position.x);
+            PlayerPrefs.SetFloat(i + "_z", d.transform.position.z);
+            PlayerPrefs.SetInt(i + "_route", d.RouteIndex);
+        }
+        PlayerPrefs.SetInt("route size", Route.Count);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadData()
+    {
+        while (destinations.Count > 0)
+            RemoveMarker(0);
+
+        int c = PlayerPrefs.GetInt("destination count");
+        Destination[] rt = new Destination[PlayerPrefs.GetInt("route size")];
+        for (int i = 0; i < c; i++) {
+            Destination destination = GameObject.Instantiate(PointerObject);
+            destination.transform.position = new Vector3(PlayerPrefs.GetFloat(i + "_x"), 0, PlayerPrefs.GetFloat(i + "_z"));
+            var r = PlayerPrefs.GetInt(i + "_route");
+            if (r >= 0) {
+                rt[r] = destination;
+                destination.RouteIndex = r;
+            }
+            destinations.Add(destination);
+        }
+        Route = new List<Destination>(rt);
     }
 }

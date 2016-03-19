@@ -68,7 +68,6 @@ public class TouchListener : MonoBehaviour {
 
     public void Taparuni()
     {
-        Debug.Log("taparuni" + timer);
         if (timer > 0)
         {
             SetUiMode(UiMode.MAIN);
