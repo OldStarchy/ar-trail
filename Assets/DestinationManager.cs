@@ -10,22 +10,24 @@ public class DestinationManager : MonoBehaviour
     private GPSlocation initialLocation = null;
     private GPSlocation currentLocation = null;
     public UIMachine takeItToTheLimit_this_week_in_esoteric_programming;
-
+    public Vector3 startPos;
     public TextMesh LatitudeReadout;
     public TextMesh LongditudeReadout;
     public TextMesh AccuracyReadout;
     public TextMesh DirectionReadout2;
-
+    public TextMesh CompassAccuracy;
     public TextMesh PathInstructionsThing;
+    public float XXinit = 0;
+    public float ZZinit = 0;
     public Transform AccuracyCircle;
-
+    private Quaternion prevRotation;
     public CardboardHead head;
-
+    public Vector3 initialPosition;
     [Header("Virtual GPS")]
     public bool EnableVirtualGPS;
-    [Range(34.73213f - 0.0001f, 34.73213f + 0.0001f)]
+    [Range(34.63213f - 0.0001f, 34.83213f + 0.0001f)]
     public double Latitude = 34.73213;
-    [Range(135.7348f - 0.0001f, 135.7348f + 0.0001f)]
+    [Range(135.6348f - 0.0001f, 135.8348f + 0.0001f)]
     public double Longditude = 135.7348;
     [Range(0.5f, 1000)]
     public double Accuracy = 1;
@@ -107,6 +109,9 @@ public class DestinationManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float y = Cardboard.SDK.HeadPose.Orientation.eulerAngles.y;
+        //        float phoneDirection = (-Input.compass.trueHeading);        float cardboardDirection = Mathf.Atan2(transform.GetChild(0).forward.z, transform.GetChild(0).forward.x) * Mathf.Rad2Deg;
+        CompassAccuracy.text = "Input Dir: " + (prevRotation.eulerAngles.y-y) + " Act: " + y;
         if (Input.location.status == LocationServiceStatus.Running || EnableVirtualGPS) {
             var gl = getLatLong();
 
@@ -120,12 +125,21 @@ public class DestinationManager : MonoBehaviour
                 ResetLocation();
             } else {
                 var ogl = initialLocation;
-
-                float dir =(float) GPSlocation.Direction(ogl, gl);
-                float dist =(float) GPSlocation.Distance(ogl, gl);
-                Vector3 vec = new Vector3(Mathf.Cos(dir), 0, Mathf.Sin(dir)) * dist;
+             //   float radius = 6371;
+                float xCur = (float)gl.latitude;//radius * Mathf.Cos((float)gl.latitude) * Mathf.Cos((float)gl.longitude);
+                float zCur = (float)gl.longitude;//radius * Mathf.Cos((float)gl.latitude) * Mathf.Sin((float)gl.longitude);
+                float xInit = (float)ogl.latitude;//radius * Mathf.Cos((float)ogl.latitude) * Mathf.Cos((float)ogl.longitude);
+                float zInit = (float)ogl.longitude;//radius * Mathf.Cos((float)ogl.latitude) * Mathf.Sin((float)ogl.longitude);
+//                float dir = (float)transform.forward;//GPSlocation.Direction(ogl, gl);
+//                float dist =(float) GPSlocation.Distance(ogl, gl);
+//                Vector3 vec = new Vector3(Mathf.Cos(dir), 0, Mathf.Sin(dir)) * dist;
                 //Vector3 vec = new Vector3(loc.latitude - initialLocation.Value.latitude, 0, initialLocation.Value.longitude - loc.longitude);
-                transform.position = vec;
+
+                XXinit = (xCur - xInit) * (40075.0f/360)*1000;
+                ZZinit = (zCur - zInit) * (40075.0f/360)*1000;
+                transform.position = initialPosition + new Vector3(ZZinit, 0, XXinit);//initialPosition + transform.forward * (xCur - xInit);// +transform.right * (zCur - zInit);
+//                transform.position = initialPosition + ;//;, 0, z);
+//                transform.position = new Vector3(x,0,z);
             }
 
             if (FollowingRoute) {
@@ -191,21 +205,23 @@ public class DestinationManager : MonoBehaviour
 
     public void ResetLocation()
     {
+        transform.position = new Vector3(0, 0, 0);
         if (Input.location.status != LocationServiceStatus.Running && !EnableVirtualGPS)
             return;
         var loc = getLatLong();
 
         initialLocation = loc;
-
-
-        float phoneDirection = (90 - Input.compass.trueHeading);
-        float cardboardDirection = Mathf.Atan2(transform.GetChild(0).forward.z, transform.GetChild(0).forward.x) * Mathf.Rad2Deg;
-        float delta = cardboardDirection - phoneDirection;
+        initialPosition = transform.position;
+        prevRotation = Cardboard.SDK.HeadPose.Orientation;
+//        float phoneDirection = (90-Input.compass.magneticHeading);
+        float cardboardDirection = prevRotation.eulerAngles.y; //Mathf.Atan2(transform.GetChild(0).forward.z, transform.GetChild(0).forward.x) * Mathf.Rad2Deg;
+        float delta = cardboardDirection;
 
         //transform.rotation = Quaternion.AngleAxis(delta + Mathf.PI, Vector3.up);
 
-        //delta = Input.GetAxis("Horizontal") + 0.5f;
-        transform.Rotate(Vector3.up, delta);
+//        //delta = Input.GetAxis("Horizontal") + 0.5f;
+   //       transform.Rotate(Vector3.up, delta);
+      //  transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x,cardboardDirection,transform.rotation.eulerAngles.z);
         DirectionReadout2.text = "" + delta;
         head.trackRotation = true;
     }
