@@ -5,17 +5,22 @@ public class MarkerInfoPanel : MonoBehaviour
 {
     public MarkerListPanel MarkerListPanel;
     public Text IdTextBox;
-    private int _markerNumber;
-    public int MarkerNumber
+    public int MarkerNumber;
+    private int _routeNumber;
+    public int RouteNumber
     {
         get
         {
-            return _markerNumber;
+            return _routeNumber;
         }
         set
         {
-            _markerNumber = value;
-            IdTextBox.text = "" + value;
+            _routeNumber = value;
+            if (value < 0) {
+                IdTextBox.text = "-";
+            } else {
+                IdTextBox.text = (value + 1).ToString();
+            }
         }
     }
 
@@ -26,11 +31,16 @@ public class MarkerInfoPanel : MonoBehaviour
 
     public void FindMarker()
     {
-        MarkerListPanel.FindMarker(_markerNumber);
+        MarkerListPanel.FindMarker(MarkerNumber);
     }
 
     public void DeleteMarker()
     {
         MarkerListPanel.RemoveMarker(this);
+    }
+
+    public void ToggleInCource()
+    {
+        MarkerListPanel.ToggleInRoute(this);
     }
 }

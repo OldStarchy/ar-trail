@@ -1,25 +1,24 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
 
 public class GPSlocation
 {
 	public double latitude;
 	public double longitude;
+    public double horizontalAccuracy;
+    public LocationInfo? locinfo;
 
-    public GPSlocation(double x, double y)
+	public GPSlocation(double x, double y, double ha)
 	{
 		latitude = x;
 		longitude = y;
+        horizontalAccuracy = ha;
+        locinfo = null;
 	}
 
-	public GPSlocation(float x, float y)
-	{
-		latitude = (double)x;
-		longitude = (double)y;
-	}
-
-    public GPSlocation(LocationInfo loc) : this(loc.latitude, loc.longitude) {}
+    public GPSlocation(LocationInfo loc) : this(loc.latitude, loc.longitude, loc.horizontalAccuracy) {
+        locinfo = loc;
+    }
 
     public static double Distance(GPSlocation a, GPSlocation b) 
 	{
@@ -49,4 +48,9 @@ public class GPSlocation
 
 		return (angle -90); // convention: 0 degrees when it's vertical, positive counterclockwise
 	}
+
+    public static explicit operator Vector3 (GPSlocation loc)
+    {
+        return new Vector3((float)loc.latitude, 0, (float)loc.longitude);
+    }
 }

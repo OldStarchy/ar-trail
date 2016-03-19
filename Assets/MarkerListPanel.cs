@@ -10,19 +10,19 @@ public class MarkerListPanel : MonoBehaviour {
 
     public GameObject DeletePanel;
     public GameObject OtherPanel;
-    // Use this for initialization
-    void Start() {
-
-    }
-
-    // Update is called once per frame
-    void Update() {
-
-    }
 
     void OnEnable()
     {
         ReloadChildren();
+    }
+
+    public void ToggleInRoute(MarkerInfoPanel mip)
+    {
+        int r = DestinationManager.ToggleInRoute(mip.MarkerNumber);
+        if (r == -1)
+            ReloadChildren();
+        else
+            mip.RouteNumber = r;
     }
 
     public void ReloadChildren()
@@ -36,9 +36,11 @@ public class MarkerListPanel : MonoBehaviour {
         {
             MarkerInfoPanel mip = GameObject.Instantiate<MarkerInfoPanel>(InfoPanel);
             mip.gameObject.transform.SetParent(this.transform);
-            mip.MarkerNumber = i;
+            
+            mip.RouteNumber = DestinationManager.GetDestination(i).RouteIndex;
             mip.transform.localScale = Vector3.one;
             mip.MarkerListPanel = this;
+            mip.MarkerNumber = i;
             if (i == highlightedIndex)
                 mip.SetHighlighted(Color.green);
         }
